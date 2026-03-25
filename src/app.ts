@@ -24,9 +24,14 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Swagger UI
-const swaggerDocument = YAML.load(
-  path.join(__dirname, '../swagger.yaml')
-);
+import fs from 'fs';
+
+let swaggerPath = path.join(__dirname, '../swagger.yaml');
+if (!fs.existsSync(swaggerPath)) {
+  swaggerPath = path.join(__dirname, '../../swagger.yaml');
+}
+const swaggerDocument = YAML.load(swaggerPath);
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
