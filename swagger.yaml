@@ -1,0 +1,145 @@
+openapi: '3.0.0'
+info:
+  title: Document Generation Service
+  version: '1.0.0'
+  description: API de génération de documents CERFA en batch
+
+servers:
+  - url: http://localhost:3000
+    description: Développement local
+  - url: https://doc-service.onrender.com
+    description: Production
+
+paths:
+  /api/documents/batch:
+    post:
+      summary: Lancer une génération de batch
+      tags: [Batch]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userIds]
+              properties:
+                userIds:
+                  type: array
+                  items:
+                    type: string
+                  minItems: 1
+                  maxItems: 1000
+                  example: ['user-001', 'user-002', 'user-003']
+      responses:
+        '202':
+          description: Batch lancé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  batchId:
+                    type: string
+                  message:
+                    type: string
+                  statusUrl:
+                    type: string
+        '400':
+          description: Données invalides
+        '429':
+          description: Trop de requêtes
+
+  /api/documents/batch/{batchId}:
+    get:
+      summary: Statut d'un batch
+      tags: [Batch]
+      parameters:
+        - in: path
+          name: batchId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Statut du batch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  batchId:
+                    type: string
+                  status:
+                    type: string
+                    enum: [pending, processing, completed, failed]
+                  totalDocuments:
+                    type: integer
+                  processedDocuments:
+                    type: integer
+                  failedDocuments:
+                    type: integer
+                  documentIds:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: Batch introuvable
+
+  /api/documents/{documentId}:
+    get:
+      summary: Télécharger un PDF généré
+      tags: [Documents]
+      parameters:
+        - in: path
+          name: documentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Fichier PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Document introuvable ou non prêt
+
+  /health:
+    get:
+      summary: Health check
+      tags: [Monitoring]
+      responses:
+        '200':
+          description: Service en bonne santé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  services:
+                    type: object
+                    properties:
+                      mongodb:
+                        type: string
+                      redis:
+                        type: string
+
+  /metrics:
+    get:
+      summary: Métriques Prometheus
+      tags: [Monitoring]
+      responses:
+        '200':
+          description: Métriques au format Prometheus
+          content:
+            text/plain:
+              schema:
+                type: string
