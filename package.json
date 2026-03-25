@@ -2,15 +2,15 @@
   "name": "doc-service",
   "version": "1.0.0",
   "main": "index.js",
- "scripts": {
-  "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-  "build": "tsc",
-  "start": "node dist/src/server.js",
-  "worker": "ts-node-dev --respawn --transpile-only workers/queueWorker.ts",
-  "benchmark": "ts-node scripts/benchmark.ts",
-  "test": "jest --runInBand",
-  "lint": "eslint . --ext .ts"
-},
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/src/server.js",
+    "worker": "ts-node-dev --respawn --transpile-only workers/queueWorker.ts",
+    "benchmark": "ts-node scripts/benchmark.ts",
+    "test": "jest --runInBand",
+    "lint": "eslint . --ext .ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
